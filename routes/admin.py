@@ -1,6 +1,15 @@
 from flask import Blueprint, jsonify
 from app.models.payment import Payment
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
+@admin_bp.route("/payments")
+@jwt_required()
+def get_payments():
+
+    user = get_jwt_identity()
+
+    if user["role"] != "admin":
+        return {"error": "Unauthorized"}, 403
 admin_bp = Blueprint("admin", __name__, url_prefix="/api/v1/admin")
 
 
