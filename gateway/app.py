@@ -1,25 +1,14 @@
-from flask import Flask, request
-import requests
+from flask import Flask
+from config import Config
+from extensions import db, jwt
 
+from models.user import User
+from models.tool import Tool
 app = Flask(__name__)
+app.config.from_object(Config)
 
-SERVICES = {
-    "auth": "http://auth-service:5001",
-    "tools": "http://tools-service:5002",
-    "billing": "http://billing-service:5003",
-    "analytics": "http://analytics-service:5004"
-}
+db.init_app(app)
+jwt.init_app(app)
 
-
-@app.route("/api/auth/<path:path>", methods=["GET", "POST"])
-def auth_proxy(path):
-
-    url = f"{SERVICES['auth']}/{path}"
-
-    response = requests.request(
-        method=request.method,
-        url=url,
-        json=request.get_json()
-    )
-
-    return response.json()
+with app.app_context():
+    db.create_all()
