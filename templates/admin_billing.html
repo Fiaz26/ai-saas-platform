@@ -1,1 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Billing Dashboard</title>
 
+<style>
+body {
+    font-family: Arial;
+    background: #0f172a;
+    color: white;
+    padding: 30px;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+.card {
+    background: #111827;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+button {
+    padding: 10px 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.approve {
+    background: #22c55e;
+    color: white;
+}
+
+.reject {
+    background: #ef4444;
+    color: white;
+}
+
+small {
+    color: #94a3b8;
+}
+</style>
+</head>
+
+<body>
+
+<h1>💰 Admin Billing Dashboard</h1>
+
+<div id="payments">Loading payments...</div>
+
+<script>
+
+async function loadPayments() {
+
+    const res = await fetch("/api/v1/admin/payments");
+    const data = await res.json();
+
+    const container = document.getElementById("payments");
+
+    if (!data.length) {
+        container.innerHTML = "<p>No pending payments</p>";
+        return;
+    }
+
+    container.innerHTML = data.map(p => `
+        <div class="card">
+            <h3>User ID: ${p.user_id}</h3>
+            <p>Amount: ${p.amount}</p>
+            <p>Method: ${p.method}</p>
+            <p><small>TXN: ${p.transaction_id}</small></p>
+
+            <button class="approve" onclick="approve(${p.id})">
+                Approve
+            </button>
+
+            <button class="reject" onclick="rejectPayment(${p.id})">
+                Reject
+            </button>
+        </div>
+    `).join("");
+}
+
+async function approve(id) {
+
+    await fetch(`/api/v1/billing/approve/${id}`, {
+        method: "POST"
+    });
+
+    loadPayments();
+}
+
+async function rejectPayment(id) {
+
+    await fetch(`/api/v1/admin/reject/${id}`, {
+        method: "POST"
+    });
+
+    loadPayments();
+}
+
+loadPayments();
+
+</script>
+
+</body>
+</html>
