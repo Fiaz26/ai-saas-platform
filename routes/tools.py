@@ -1,26 +1,37 @@
 from flask import Blueprint, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.models.user import User
-from app.extensions import db
+
+from app.services.billing_service import deduct_credits
+from app.services.usage_service import log_usage
 
 tools_bp = Blueprint("tools", __name__, url_prefix="/api/v1")
 
+
 TOOLS = [
-    {"id": 1, "name": "AI Writer", "category": "Content"},
-    {"id": 2, "name": "SEO Tool", "category": "Marketing"}
+    {"id": 1, "name": "AI Writer"},
+    {"id": 2, "name": "SEO Analyzer"}
 ]
+
 
 @tools_bp.route("/tools", methods=["GET"])
 @jwt_required()
 def get_tools():
 
-    user_data = get_jwt_identity()
-    user = User.query.get(user_data["user_id"])
+    user = get_jwt_identity()
 
-    if user.credits <= 0:
-        return jsonify({"error": "No credits left"}), 403
+    return jsonify(TOOLS)
 
-    return jsonify({
-        "tools": TOOLS,
-        "credits": user.credits
-    })
+
+@tools_bp.route("/tools/use", methods=["POST"])
+@jwt_required()
+def use_tool():
+
+    user = get_jwt_identity()
+
+    # CREDIT CHECK
+    if not deduct_credits(user["user_id"], 1):
+        return {"error": "No credits"}, 403
+
+    log_usage(user["user_id"], "AI Tool")
+
+    return {"message": "Tool executed successfully"}
