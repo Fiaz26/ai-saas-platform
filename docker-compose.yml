@@ -1,4 +1,4 @@
-version: "3"
+version: "3.9"
 
 services:
 
@@ -6,15 +6,35 @@ services:
     build: ./gateway
     ports:
       - "8000:8000"
+    depends_on:
+      - auth-service
+      - billing-service
 
   auth-service:
     build: ./services/auth-service
+    ports:
+      - "5001:5000"
 
   billing-service:
     build: ./services/billing-service
-
-  analytics-service:
-    build: ./services/analytics-service
+    ports:
+      - "5002:5000"
 
   tools-service:
     build: ./services/tools-service
+    ports:
+      - "5003:5000"
+
+  analytics-service:
+    build: ./services/analytics-service
+    ports:
+      - "5004:5000"
+
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: saas_db
+    ports:
+      - "5432:5432"
