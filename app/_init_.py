@@ -15,7 +15,9 @@ def create_app():
     from .routes.tools import tools_bp
     from .routes.admin import admin_bp
     from .routes.billing import billing_bp
+from .routes.analytics import analytics_bp
 
+app.register_blueprint(analytics_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(tools_bp)
     app.register_blueprint(admin_bp)
