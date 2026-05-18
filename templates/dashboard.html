@@ -1,1 +1,5 @@
-
+fetch("/api/v1/tools", {
+    headers: {
+        Authorization: "Bearer " + localStorage.getItem("token")
+    }
+})
