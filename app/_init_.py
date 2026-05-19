@@ -1,7 +1,12 @@
 from flask import Flask
 from config.base import Config
 from app.extensions import db, jwt
+from app.api.v1.subscriptions import subscription_bp
 
+app.register_blueprint(
+    subscription_bp,
+    url_prefix="/api/v1/subscriptions"
+)
 def create_app(config_class=Config):
 
     app = Flask(__name__)
