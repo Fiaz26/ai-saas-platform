@@ -1,6 +1,9 @@
 from app.extensions import db
 from app.api.v1.marketplace import marketplace_bp
-
+vendor_id = db.Column(
+    db.Integer,
+    db.ForeignKey("vendor.id")
+)
 app.register_blueprint(
     marketplace_bp,
     url_prefix="/api/v1/marketplace"
