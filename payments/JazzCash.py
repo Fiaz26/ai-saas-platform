@@ -1,5 +1,7 @@
 import hashlib
 import urllib.parse
+from app.services.subscription_service import SubscriptionService
+
 from config import Config
 import logging
 logging.info(f"JazzCash callback received: {data}")
