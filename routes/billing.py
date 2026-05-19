@@ -1,47 +1,31 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.models.payment import Payment
-from app.models.user import User
-from app.extensions import db
 
-billing_bp = Blueprint("billing", __name__, url_prefix="/api/v1/billing")
+from app.services.billing_service import BillingService
 
+billing_bp = Blueprint("billing", __name__)
 
-# USER SUBMITS PAYMENT PROOF
-@billing_bp.route("/submit-payment", methods=["POST"])
+@billing_bp.route("/credits")
 @jwt_required()
-def submit_payment():
+def get_credits():
 
-    user_data = get_jwt_identity()
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
 
-    data = request.get_json()
-
-    payment = Payment(
-        user_id=user_data["user_id"],
-        amount=data["amount"],
-        method=data["method"],
-        transaction_id=data["transaction_id"],
-        status="pending"
-    )
-
-    db.session.add(payment)
-    db.session.commit()
-
-    return jsonify({"message": "Payment submitted, awaiting approval"})
+    return jsonify({
+        "credits": user.credits
+    })
 
 
-# ADMIN APPROVES PAYMENT
-@billing_bp.route("/approve/<int:payment_id>", methods=["POST"])
-def approve_payment(payment_id):
+@billing_bp.route("/add-demo-credits")
+@jwt_required()
+def add_demo_credits():
 
-    payment = Payment.query.get(payment_id)
-    payment.status = "approved"
+    user_id = get_jwt_identity()
 
-    user = User.query.get(payment.user_id)
+    new_balance = BillingService.add_credits(user_id, 50, "manual")
 
-    # CREDIT ALLOCATION LOGIC
-    user.credits += int(payment.amount * 10)
-
-    db.session.commit()
-
-    return jsonify({"message": "Payment approved"})
+    return jsonify({
+        "message": "Credits added",
+        "balance": new_balance
+    })
