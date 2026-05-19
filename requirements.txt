@@ -1,4 +1,5 @@
-
+Flask-Limiter
+redis
 Flask
 Flask-SQLAlchemy
 Flask-JWT-Extended
