@@ -1,6 +1,12 @@
 from flask import Flask
 from config.base import Config
 from app.extensions import db, jwt
+from app.api.v1.vendors import vendor_bp
+
+app.register_blueprint(
+    vendor_bp,
+    url_prefix="/api/v1/vendors"
+)
 from app.api.v1.subscriptions import subscription_bp
 
 app.register_blueprint(
