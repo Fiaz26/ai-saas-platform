@@ -13,3 +13,35 @@ async function loadCredits() {
     document.getElementById("credits").innerText =
         "Credits: " + data.credits;
 }
+async function loadMarketplace() {
+
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(
+        "/api/v1/marketplace/",
+        {
+            headers: {
+                Authorization: "Bearer " + token
+            }
+        }
+    );
+
+    const apis = await res.json();
+
+    document.getElementById("marketplace").innerHTML =
+        apis.map(api => `
+            <div class="card">
+                <h3>${api.name}</h3>
+                <p>${api.description}</p>
+
+                <p>
+                    Credits:
+                    ${api.credit_cost}
+                </p>
+
+                <button onclick="useAPI('${api.slug}')">
+                    Use API
+                </button>
+            </div>
+        `).join("");
+}
