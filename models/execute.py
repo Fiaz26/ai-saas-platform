@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.services.revenue_service import RevenueService
 from app import limiter
+from app.middleware.credit_guard import has_credits
 from app.models.ai_api import AIAPI
 from app.services.billing_service import BillingService
 
@@ -24,6 +25,10 @@ limiter = Limiter(
     key_func=user_rate_limit,
     default_limits=["1000 per day"]
 )
+if not has_credits(api.credit_cost):
+    return {
+        "error": "Insufficient credits"
+    }, 403
 
     # deduct credits
     success = BillingService.deduct_credits(
