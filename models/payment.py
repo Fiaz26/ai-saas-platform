@@ -1,6 +1,6 @@
 I'mfrom app.extensions import db
 from datetime import datetime
-
+JAZZCASH_MERCHANT_ID = os.getenv("JAZZCASH_MERCHANT_ID")
 class Payment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
