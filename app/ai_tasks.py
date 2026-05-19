@@ -1,6 +1,10 @@
 from app import celery
 import time
-
+from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required
+from app.tasks.ai_tasks import run_ai_task
+from celery.result import AsyncResult
+from app import celery
 @celery.task(bind=True)
 def run_ai_task(self, prompt, api_name):
 
@@ -24,13 +28,18 @@ def run_ai_task(self, prompt, api_name):
             "status": "failed",
             "error": str(e)
         }
-from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required
+@tasks_bp.route("/status/<task_id>")
+@jwt_required()
+def task_status(task_id):
 
-from app.tasks.ai_tasks import run_ai_task
+    task = AsyncResult(task_id, app=celery)
 
+    return jsonify({
+        "task_id": task_id,
+        "state": task.state,
+        "result": task.result
+    })
 tasks_bp = Blueprint("tasks", __name__)
-
 @tasks_bp.route("/run", methods=["POST"])
 @jwt_required()
 def run_task():
