@@ -1,14 +1,18 @@
 from app.extensions import db
+from datetime import datetime
 
 class Payment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
-    user_id = db.Column(db.Integer)
-    amount = db.Column(db.Float)
+    user_id = db.Column(db.Integer, nullable=False)
+    order_id = db.Column(db.String(120), unique=True)
 
-    method = db.Column(db.String(50))  # jazzcash, easypaisa, bank
-    status = db.Column(db.String(20), default="pending")
+    amount = db.Column(db.Integer)
+    status = db.Column(db.String(50))  # success / failed / pending
 
-    transaction_id = db.Column(db.String(100))
+    provider = db.Column(db.String(50))  # jazzcash
 
-    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    txn_ref = db.Column(db.String(120))
+    raw_response = db.Column(db.Text)
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
