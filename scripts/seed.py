@@ -1,7 +1,9 @@
-from app import app
+from app import create_app
 from extensions import db
 from models.tool import Tool
-
+app = create_app()
+from extensions import db
+from models.tool import Tool
 with app.app_context():
 
     tool = Tool(
