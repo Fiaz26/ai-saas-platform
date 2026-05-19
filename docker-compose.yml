@@ -2,39 +2,27 @@ version: "3.9"
 
 services:
 
-  gateway:
-    build: ./gateway
+  web:
+    build: .
     ports:
       - "8000:8000"
     depends_on:
-      - auth-service
-      - billing-service
+      - redis
+      - db
 
-  auth-service:
-    build: ./services/auth-service
-    ports:
-      - "5001:5000"
+  worker:
+    build: .
+    command: celery -A app.celery_app worker --loglevel=info
+    depends_on:
+      - redis
+      - db
 
-  billing-service:
-    build: ./services/billing-service
-    ports:
-      - "5002:5000"
+  redis:
+    image: redis:7
 
-  tools-service:
-    build: ./services/tools-service
-    ports:
-      - "5003:5000"
-
-  analytics-service:
-    build: ./services/analytics-service
-    ports:
-      - "5004:5000"
-
-  postgres:
+  db:
     image: postgres:15
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: saas
+      POSTGRES_PASSWORD: saas123
       POSTGRES_DB: saas_db
-    ports:
-      - "5432:5432"
