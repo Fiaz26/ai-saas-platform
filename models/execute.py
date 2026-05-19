@@ -20,11 +20,10 @@ def execute_api(slug):
 
     if not api:
         return {"error": "API not found"}, 404
-@limiter.limit("10 per minute")
-@execute_bp.route("/<slug>", methods=["POST"])
-@jwt_required()
-@limiter.limit("10 per minute")
-def execute_api(slug):
+limiter = Limiter(
+    key_func=user_rate_limit,
+    default_limits=["1000 per day"]
+)
 
     # deduct credits
     success = BillingService.deduct_credits(
