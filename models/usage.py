@@ -1,11 +1,11 @@
 from app.extensions import db
+from datetime import datetime
 
-class Usage(db.Model):
+class UsageLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    tool_name = db.Column(db.String(100))
+    user_id = db.Column(db.Integer)
+    tool_name = db.Column(db.String(120))
+    credits_used = db.Column(db.Integer)
 
-    credits_used = db.Column(db.Integer, default=1)
-
-    timestamp = db.Column(db.DateTime, server_default=db.func.now())
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
