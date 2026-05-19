@@ -11,3 +11,7 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+    
+JAZZCASH_MERCHANT_ID = "YOUR_MERCHANT_ID"
+JAZZCASH_INTEGRITY_SALT = "YOUR_SALT"
+JAZZCASH_RETURN_URL = "https://yourdomain.com/api/v1/pay/jazzcash/callback"
