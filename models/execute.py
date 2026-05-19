@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.services.revenue_service import RevenueService
+from app import limiter
 from app.models.ai_api import AIAPI
 from app.services.billing_service import BillingService
 
@@ -19,6 +20,11 @@ def execute_api(slug):
 
     if not api:
         return {"error": "API not found"}, 404
+@limiter.limit("10 per minute")
+@execute_bp.route("/<slug>", methods=["POST"])
+@jwt_required()
+@limiter.limit("10 per minute")
+def execute_api(slug):
 
     # deduct credits
     success = BillingService.deduct_credits(
