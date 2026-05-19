@@ -12,6 +12,7 @@ def init_payment():
 
     user_id = get_jwt_identity()
     amount = request.json.get("amount")
+    
 
     order_id = f"ORDER_{user_id}"
 
@@ -21,3 +22,24 @@ def init_payment():
         "payment_url": "https://sandbox.jazzcash.com.pk/CustomerPortal/transactionmanagement/merchantform/",
         "payload": payload
     })
+from app.services.billing_service import BillingService
+
+@payment_bp.route("/jazzcash/callback", methods=["POST"])
+def jazzcash_callback():
+
+    data = request.form
+
+    status = data.get("pp_ResponseCode")
+    user_id = data.get("pp_BillReference")
+
+    if status == "000":
+
+        BillingService.add_credits(
+            user_id=user_id,
+            amount=100,  # example package
+            method="jazzcash"
+        )
+
+        return "Payment Successful"
+
+    return "Payment Failed"
