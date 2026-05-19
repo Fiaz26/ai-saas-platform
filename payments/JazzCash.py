@@ -1,7 +1,8 @@
 import hashlib
 import urllib.parse
 from config import Config
-
+import logging
+logging.info(f"JazzCash callback received: {data}")
 def generate_jazzcash_payload(amount, order_id):
 
     data = {
