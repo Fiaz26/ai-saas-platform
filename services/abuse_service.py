@@ -12,3 +12,9 @@ class AbuseService:
         redis_client.expire(key, 60)
 
         return count
+count = AbuseService.track(user_id)
+
+if count > 30:
+    return {
+        "error": "Too many requests"
+    }, 429
