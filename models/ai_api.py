@@ -1,5 +1,10 @@
 from app.extensions import db
+from app.api.v1.marketplace import marketplace_bp
 
+app.register_blueprint(
+    marketplace_bp,
+    url_prefix="/api/v1/marketplace"
+)
 class AIAPI(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
