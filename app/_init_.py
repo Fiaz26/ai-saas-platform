@@ -9,7 +9,7 @@ from app.api.v1.vendors import vendor_bp
 from app.api.v1.subscriptions import subscription_bp
 from app.api.v1.tasks import tasks_bp
 from app.api.v1.payments import payment_bp
-from app.celery_app import make_celery
+from app.celery_app import celery
 
 celery = None
 
