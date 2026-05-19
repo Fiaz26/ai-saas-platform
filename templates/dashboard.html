@@ -45,3 +45,31 @@ async function loadMarketplace() {
             </div>
         `).join("");
 }
+async function useAPI(slug) {
+
+    const token = localStorage.getItem("token");
+
+    const prompt = prompt("Enter prompt");
+
+    const res = await fetch(
+        "/api/v1/execute/" + slug,
+        {
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + token
+            },
+
+            body: JSON.stringify({
+                prompt
+            })
+        }
+    );
+
+    const data = await res.json();
+
+    console.log(data);
+
+    alert(JSON.stringify(data));
+}
