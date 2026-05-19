@@ -1,7 +1,15 @@
-const token = localStorage.getItem("token");
+<div id="credits">Loading...</div>
+async function loadCredits() {
+    const token = localStorage.getItem("token");
 
-fetch("/api/tools", {
-    headers: {
-        "Authorization": `Bearer ${token}`
-    }
-})
+    const res = await fetch("/api/v1/billing/credits", {
+        headers: {
+            "Authorization": "Bearer " + token
+        }
+    });
+
+    const data = await res.json();
+
+    document.getElementById("credits").innerText =
+        "Credits: " + data.credits;
+}
