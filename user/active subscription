@@ -1,1 +1,20 @@
+from app.extensions import db
+from datetime import datetime, timedelta
 
+class Subscription(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    user_id = db.Column(db.Integer, nullable=False)
+
+    plan_name = db.Column(db.String(50))
+    status = db.Column(db.String(50), default="active")
+
+    monthly_credits = db.Column(db.Integer)
+
+    started_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    expires_at = db.Column(
+        db.DateTime,
+        default=lambda: datetime.utcnow() + timedelta(days=30)
+    )
