@@ -1,6 +1,8 @@
 from flask import Flask
 from config.base import Config
 from app.extensions import db, jwt
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from app.api.v1.vendors import vendor_bp
 
 app.register_blueprint(
@@ -13,6 +15,12 @@ app.register_blueprint(
     subscription_bp,
     url_prefix="/api/v1/subscriptions"
 )
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=["100 per hour"]
+)
+
+limiter.init_app(app)
 def create_app(config_class=Config):
 
     app = Flask(__name__)
