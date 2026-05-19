@@ -22,3 +22,54 @@ from app.models.payment import Payment
 from app.extensions import db
 from app.services.billing_service import BillingService
 from config import Config
+@payment_bp.route("/jazzcash/callback", methods=["POST"])
+def jazzcash_callback():
+
+    data = request.form.to_dict()
+
+    received_hash = data.get("pp_SecureHash", "")
+    order_id = data.get("pp_BillReference")
+    status = data.get("pp_ResponseCode")
+    txn_ref = data.get("pp_TxnRefNo")
+
+    # STEP 1 — remove secure hash from payload
+    filtered = {k: v for k, v in data.items() if k != "pp_SecureHash"}
+
+    sorted_string = "&".join([f"{k}={filtered[k]}" for k in sorted(filtered)])
+    local_hash = hashlib.sha256(
+        (Config.JAZZCASH_INTEGRITY_SALT + "&" + sorted_string).encode()
+    ).hexdigest().upper()
+
+    # STEP 2 — HASH VALIDATION (CRITICAL SECURITY)
+    if local_hash != received_hash:
+        return "Invalid Signature", 403
+
+    # STEP 3 — FIND EXISTING PAYMENT (IDEMPOTENCY CHECK)
+    existing = Payment.query.filter_by(order_id=order_id).first()
+
+    if existing and existing.status == "success":
+        return "Already processed", 200
+
+    # STEP 4 — SAVE PAYMENT RECORD
+    payment = Payment(
+        user_id=int(order_id.replace("ORDER_", "")),
+        order_id=order_id,
+        amount=int(data.get("pp_Amount", 0)) // 100,
+        status="success" if status == "000" else "failed",
+        provider="jazzcash",
+        txn_ref=txn_ref,
+        raw_response=str(data)
+    )
+
+    db.session.add(payment)
+    db.session.commit()
+
+    # STEP 5 — ONLY CREDIT ON SUCCESS
+    if status == "000":
+        BillingService.add_credits(
+            user_id=payment.user_id,
+            amount=payment.amount,
+            method="jazzcash"
+        )
+
+    return "OK", 200
