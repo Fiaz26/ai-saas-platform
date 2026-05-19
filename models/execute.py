@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-
+from app.services.revenue_service import RevenueService
 from app.models.ai_api import AIAPI
 from app.services.billing_service import BillingService
 
@@ -31,7 +31,10 @@ def execute_api(slug):
         return {
             "error": "Insufficient credits"
         }, 403
-
+RevenueService.distribute(
+    api,
+    api.credit_cost
+)
     # fake AI response example
     prompt = request.json.get("prompt")
 
