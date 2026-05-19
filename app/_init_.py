@@ -1,46 +1,21 @@
 from flask import Flask
-from config import Config
-from extensions import db, jwt
+from config.base import Config
+from app.extensions import db, jwt
 
-from routers.users import users_bp
-from routers.tools import tools_bp
-from routers.admin import admin_bp
-from routers.billing import billing_bp
-def create_app():
+def create_app(config_class=Config):
+
     app = Flask(__name__)
-    app.config.from_object(Config)
+    app.config.from_object(config_class)
 
     db.init_app(app)
     jwt.init_app(app)
 
-    return app
+    # register blueprints
+    from app.api.v1.auth import auth_bp
+    from app.api.v1.tools import tools_bp
 
-    # blueprints
-    app.register_blueprint(users_bp)
-    app.register_blueprint(tools_bp)
-    app.register_blueprint(admin_bp)
-    app.register_blueprint(billing_bp)
-
-    # pages
-    @app.route("/")
-    def home():
-        return render_template("index.html")
-
-    @app.route("/dashboard")
-    def dashboard():
-        return render_template("dashboard.html")
-
-    @app.route("/login")
-    def login():
-        return render_template("login.html")
-
-    @app.route("/signup")
-    def signup():
-        return render_template("signup.html")
-
-    @app.route("/health")
-    def health():
-        return {"status": "ok"}
+    app.register_blueprint(auth_bp, url_prefix="/api/v1/auth")
+    app.register_blueprint(tools_bp, url_prefix="/api/v1/tools")
 
     return app
 
