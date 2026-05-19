@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask
 from config import Config
 from extensions import db, jwt
 
@@ -6,15 +6,14 @@ from routers.users import users_bp
 from routers.tools import tools_bp
 from routers.admin import admin_bp
 from routers.billing import billing_bp
-
-
 def create_app():
-
     app = Flask(__name__)
     app.config.from_object(Config)
 
     db.init_app(app)
     jwt.init_app(app)
+
+    return app
 
     # blueprints
     app.register_blueprint(users_bp)
