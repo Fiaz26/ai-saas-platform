@@ -2,7 +2,9 @@ from flask import Flask
 from config.base import Config
 from app.extensions import db, jwt
 from app.api.v1.payouts import payout_bp
+from app.celery_app import make_celery
 
+celery = make_celery(app)
 app.register_blueprint(
     payout_bp,
     url_prefix="/api/v1/payouts"
