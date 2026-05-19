@@ -34,11 +34,10 @@ def jazzcash_callback():
 
     if status == "000":
 
-        BillingService.add_credits(
-            user_id=user_id,
-            amount=100,  # example package
-            method="jazzcash"
-        )
+        SubscriptionService.create_subscription(
+    user_id=payment.user_id,
+    plan_name="pro"
+)
 
         return "Payment Successful"
 
