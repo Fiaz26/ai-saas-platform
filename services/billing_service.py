@@ -1,23 +1,44 @@
-from app.models.user import User
-from app.models.payment import Payment
 from app.extensions import db
+from app.models.user import User
+from app.models.transaction import Transaction
+from app.models.usage_log import UsageLog
 
-def add_credits(user_id, amount):
+class BillingService:
 
-    user = User.query.get(user_id)
-    user.credits += amount
+    @staticmethod
+    def add_credits(user_id, amount, method="manual"):
 
-    db.session.commit()
+        user = User.query.get(user_id)
+        user.credits += amount
 
+        tx = Transaction(
+            user_id=user_id,
+            amount=amount,
+            method=method
+        )
 
-def deduct_credits(user_id, amount=1):
+        db.session.add(tx)
+        db.session.commit()
 
-    user = User.query.get(user_id)
+        return user.credits
 
-    if user.credits < amount:
-        return False
+    @staticmethod
+    def deduct_credits(user_id, tool_name, cost=1):
 
-    user.credits -= amount
-    db.session.commit()
+        user = User.query.get(user_id)
 
-    return True
+        if user.credits < cost:
+            return False
+
+        user.credits -= cost
+
+        log = UsageLog(
+            user_id=user_id,
+            tool_name=tool_name,
+            credits_used=cost
+        )
+
+        db.session.add(log)
+        db.session.commit()
+
+        return True
