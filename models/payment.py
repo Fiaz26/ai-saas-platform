@@ -73,3 +73,21 @@ def jazzcash_callback():
         )
 
     return "OK", 200
+    import uuid
+
+order_id = f"JC_{user_id}_{uuid.uuid4().hex[:10]}"
+
+@payment_bp.route("/status/<order_id>")
+@jwt_required()
+def payment_status(order_id):
+
+    payment = Payment.query.filter_by(order_id=order_id).first()
+
+    if not payment:
+        return {"error": "Not found"}, 404
+
+    return {
+        "status": payment.status,
+        "amount": payment.amount,
+        "provider": payment.provider
+    }
