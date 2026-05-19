@@ -1,6 +1,12 @@
 from flask import Flask
 from config.base import Config
 from app.extensions import db, jwt
+from app.middleware.logger import (
+    before_request,
+    after_request
+)
+app.before_request(before_request)
+app.after_request(after_request)
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from app.api.v1.vendors import vendor_bp
