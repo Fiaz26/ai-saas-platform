@@ -1,6 +1,12 @@
 from flask import Flask
 from config.base import Config
 from app.extensions import db, jwt
+from app.api.v1.payouts import payout_bp
+
+app.register_blueprint(
+    payout_bp,
+    url_prefix="/api/v1/payouts"
+)
 from app.middleware.logger import (
     before_request,
     after_request
