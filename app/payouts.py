@@ -1,8 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
-
 from app.extensions import db
-
 from app.models.payout_request import PayoutRequest
 from app.models.vendor_wallet import VendorWallet
 
