@@ -18,3 +18,6 @@ app.register_blueprint(billing_bp, url_prefix="/api/v1/billing")
 
     return app
 
+from app.api.v1.payments import payment_bp
+
+app.register_blueprint(payment_bp, url_prefix="/api/v1/pay")
