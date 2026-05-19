@@ -1,0 +1,33 @@
+<button onclick="buyCredits()">Buy Credits</button>
+async function buyCredits() {
+
+    const token = localStorage.getItem("token");
+
+    const res = await fetch("/api/v1/pay/jazzcash/init", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({ amount: 500 })
+    });
+
+    const data = await res.json();
+
+    console.log(data);
+
+    // redirect user to JazzCash
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = data.payment_url;
+
+    for (let key in data.payload) {
+        const input = document.createElement("input");
+        input.name = key;
+        input.value = data.payload[key];
+        form.appendChild(input);
+    }
+
+    document.body.appendChild(form);
+    form.submit();
+}
