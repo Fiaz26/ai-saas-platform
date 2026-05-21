@@ -2,7 +2,8 @@ from app.extensions import db
 from app.models.user import User
 from app.models.transaction import Transaction
 from app.models.usage_log import UsageLog
-
+from app.models.user import User
+from extensions import db
 class BillingService:
 
     @staticmethod
@@ -23,14 +24,22 @@ class BillingService:
         return user.credits
 
     @staticmethod
-    def deduct_credits(user_id, tool_name, cost=1):
+    
 
-        user = User.query.get(user_id)
+def deduct_credits(user_id, amount):
+    user = User.query.get(user_id)
 
-        if user.credits < cost:
-            return False
+    if not user:
+        return False, "User not found"
 
-        user.credits -= cost
+    if user.credits < amount:
+        return False, "Insufficient credits"
+
+    user.credits -= amount
+
+    db.session.commit()
+
+    return True, user.credits
 
         log = UsageLog(
             user_id=user_id,
