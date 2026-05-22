@@ -1,6 +1,7 @@
 from app import create_app
 app = create_app()
-app = create_app()
+from dotenv import load_dotenv
+load_dotenv()
 celery = app.celery
 from routers.users import users_bp
 from app.routes.ai_routes import ai_bp
